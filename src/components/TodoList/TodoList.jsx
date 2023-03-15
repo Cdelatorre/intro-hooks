@@ -1,21 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { listTodos } from "../../services/TodoService";
+import Todo from "../Todo/Todo";
 
 const TodoList = () => {
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    listTodos()
+      .then((todos) => {
+        setTodos(todos);
+        setLoading(false);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  const removeTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
   return (
     <div className="m-auto mt-5" style={{ width: "500px" }}>
       <ul className="list-group">
-        <li className="list-group-item d-flex align-items-center justify-content-between">
-          <div className="form-check">
-            <label className="form-check-label" htmlFor="flexCheckDefault">
-              Default checkbox
-            </label>
-          </div>
-          <button
-            type="button"
-            className="btn-close"
-            aria-label="Close"
-          ></button>
-        </li>
+        {!loading
+          ? todos.map((todo) => {
+              return <Todo handleDelete={removeTodo} key={todo.id} {...todo} />;
+            })
+          : "LOADING..."}
       </ul>
     </div>
   );
